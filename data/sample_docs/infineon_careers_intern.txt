@@ -1,0 +1,99 @@
+INFINEON TECHNOLOGIES - CAREERS AND INTERNSHIP INFORMATION
+==========================================================
+
+Working at Infineon
+-------------------
+Infineon offers a dynamic work environment where innovation meets purpose. We believe 
+that diverse perspectives drive better solutions.
+
+OUR CULTURE:
+- Innovation-driven mindset
+- Collaborative team environment
+- Continuous learning opportunities
+- Work-life balance focus
+- Flexible working arrangements
+
+Locations with Major Offices
+----------------------------
+AUSTRIA:
+- Villach: Major R&D and manufacturing hub
+- Graz: Development center
+- Linz: Design center
+
+GERMANY:
+- Munich/Neubiberg: Global headquarters
+- Dresden: Manufacturing
+- Regensburg: Manufacturing and R&D
+- Warstein: Module production
+
+Internship Programs
+-------------------
+Infineon offers various internship opportunities for students:
+
+1. TECHNICAL INTERNSHIPS
+   Duration: 3-12 months
+   Areas:
+   - Hardware development
+   - Software engineering
+   - Process engineering
+   - Quality assurance
+   - R&D projects
+   
+2. THESIS PROJECTS
+   Duration: 6 months typically
+   Topics:
+   - AI/ML applications
+   - Power electronics
+   - Sensor development
+   - Process optimization
+
+REQUIREMENTS:
+- Currently enrolled student (Bachelor's or Master's)
+- Relevant field of study (EE, CS, Physics, etc.)
+- Good English skills (German is a plus)
+- Team player with initiative
+
+MLOps and AI Positions
+----------------------
+Infineon is expanding its AI and data science capabilities.
+
+TYPICAL RESPONSIBILITIES:
+- Develop and maintain ML pipelines
+- Implement MLOps best practices
+- Work with LLMs and NLP solutions
+- Support production AI systems
+- Collaborate with cross-functional teams
+
+REQUIRED SKILLS:
+- Python programming
+- Machine learning frameworks (PyTorch, TensorFlow)
+- CI/CD and DevOps practices
+- Linux systems
+- Cloud platforms (AWS, Azure)
+
+PREFERRED SKILLS:
+- Experience with LLMs/GenAI
+- RAG systems knowledge
+- MLflow or similar tools
+- Kubernetes and Docker
+
+Benefits
+--------
+- Competitive salary based on collective agreement
+- Flexible working hours (6 AM - 7 PM core time)
+- Home office possibilities
+- Training and development budget
+- Employee discounts
+- Health and wellness programs
+- Modern office facilities
+
+Application Process
+-------------------
+1. Online application via career portal
+2. Initial screening (CV review)
+3. Technical interview / assessment
+4. Team interview
+5. Offer decision
+
+Contact: careers@infineon.com
+Career Portal: www.infineon.com/careers

@@ -1,0 +1,27 @@
+# RAG Pipeline Dependencies
+# Install: pip install -r requirements.txt
+
+# Core
+chromadb==0.4.22
+sentence-transformers==2.2.2
+
+# API Server
+fastapi==0.109.0
+uvicorn==0.27.0
+pydantic==2.5.3
+
+# Document processing
+pymupdf==1.23.8
+pypdf==3.17.0
+
+# HTTP client
+requests==2.31.0
+
+# Configuration
+pyyaml==6.0.1
+
+# Testing
+pytest==7.4.3
+
+# Visualization
+matplotlib==3.8.2

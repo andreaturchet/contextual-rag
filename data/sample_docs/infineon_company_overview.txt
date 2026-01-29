@@ -1,0 +1,63 @@
+INFINEON TECHNOLOGIES AG - COMPANY OVERVIEW
+============================================
+
+About Infineon
+--------------
+Infineon Technologies AG is a world leader in semiconductor solutions that make life 
+easier, safer, and greener. Microelectronics from Infineon are the key to a better 
+future. The company was founded in 1999 as a spin-off from Siemens AG.
+
+Headquarters: Neubiberg (Munich), Germany
+Founded: April 1, 1999
+CEO: Jochen Hanebeck
+Employees: Approximately 56,200 worldwide
+Revenue: €14.2 billion (Fiscal Year 2023)
+
+Our Mission
+-----------
+We make life easier, safer, and greener by connecting the real and digital world.
+
+Company Segments
+----------------
+Infineon operates through four business segments:
+
+1. AUTOMOTIVE (ATV)
+   Revenue share: ~44%
+   Products: Microcontrollers, power semiconductors, sensors, and radar ICs
+   Applications: Electric vehicles, ADAS, body electronics, powertrain
+   
+2. GREEN INDUSTRIAL POWER (GIP)
+   Revenue share: ~20%
+   Products: IGBT modules, power MOSFETs, silicon carbide (SiC) devices
+   Applications: Renewable energy, industrial drives, power supplies
+
+3. POWER & SENSOR SYSTEMS (PSS)
+   Revenue share: ~28%
+   Products: Power management ICs, LED drivers, silicon microphones
+   Applications: Mobile devices, computing, IoT, lighting
+
+4. CONNECTED SECURE SYSTEMS (CSS)
+   Revenue share: ~8%
+   Products: Security controllers, authentication ICs, WiFi/Bluetooth
+   Applications: Payment cards, government ID, IoT security
+
+Global Presence
+---------------
+Manufacturing Sites:
+- Villach, Austria (300mm wafer fab)
+- Dresden, Germany (300mm wafer fab - under construction)
+- Kulim, Malaysia (wide-bandgap semiconductors)
+- Regensburg, Germany
+- Warstein, Germany
+
+R&D Centers:
+- Munich, Germany
+- Graz, Austria
+- Singapore
+- San Jose, USA
+
+Stock Information
+-----------------
+Listed: Frankfurt Stock Exchange (FRA: IFX)
+Index: DAX 40
+Market Cap: ~€45 billion (2024)

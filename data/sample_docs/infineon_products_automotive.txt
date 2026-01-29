@@ -1,0 +1,69 @@
+INFINEON AUTOMOTIVE SEMICONDUCTOR SOLUTIONS
+============================================
+
+Electric Vehicle (EV) Solutions
+-------------------------------
+Infineon is the #1 semiconductor supplier for automotive applications. Our products 
+enable the transition to electric mobility.
+
+POWER SEMICONDUCTORS FOR EVs:
+
+1. Silicon Carbide (SiC) MOSFETs
+   - CoolSiC™ family
+   - Voltage ratings: 650V to 1700V
+   - Benefits: 
+     * Higher efficiency than silicon (up to 80% lower losses)
+     * Higher switching frequency
+     * Smaller, lighter systems
+   - Applications: Traction inverters, onboard chargers, DC-DC converters
+
+2. IGBT Modules
+   - HybridPACK™ family for traction inverters
+   - EDT2 technology with optimized chip design
+   - Power ratings up to 800kW
+   - Used by major EV manufacturers worldwide
+
+3. Gate Drivers
+   - EiceDRIVER™ family
+   - Galvanically isolated
+   - Integrated protection features
+   - Essential for controlling power switches safely
+
+ADAS and Autonomous Driving:
+
+1. Radar Sensors
+   - RASIC™ family of radar ICs
+   - 77GHz automotive radar
+   - Applications:
+     * Adaptive cruise control
+     * Blind spot detection
+     * Autonomous emergency braking
+     * Parking assistance
+
+2. AURIX™ Microcontrollers
+   - 32-bit TriCore™ architecture
+   - ASIL-D safety certification
+   - Used in critical vehicle functions
+   - Applications:
+     * Powertrain control
+     * Chassis and safety
+     * ADAS domain controllers
+
+3. Pressure Sensors
+   - XENSIV™ family
+   - Applications: Tire pressure monitoring, brake systems
+
+Key Customers
+-------------
+Infineon supplies to all major automotive OEMs and Tier-1 suppliers:
+- BMW, Mercedes-Benz, Volkswagen Group
+- BYD, NIO, Xpeng
+- Bosch, Continental, ZF
+- Tesla, Rivian, Lucid
+
+Market Position
+---------------
+- #1 in automotive semiconductors globally
+- ~13% market share in automotive semiconductors
+- #1 in automotive power semiconductors
+- #1 in automotive microcontrollers (by revenue)

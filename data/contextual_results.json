@@ -1,0 +1,89 @@
+{
+  "name": "Contextual Retrieval",
+  "avg_score": 0.6814285714285715,
+  "avg_latency": 107.07537727355957,
+  "total_latency": 535.3768863677979,
+  "results": [
+    {
+      "question": "What are Infineon's main business segments?",
+      "answer": "Okay, let\u2019s analyze the provided documents to answer the question about Infineon\u2019s main business segments.\n\n1. **Relevant Documents:** Documents 1, 2, and 3 are the most relevant as they detail Infine...",
+      "latency": 113.74620699882507,
+      "score": 0.75,
+      "found_keywords": [
+        "automotive",
+        "power",
+        "sensor"
+      ],
+      "missing_keywords": [
+        "security"
+      ],
+      "num_docs": 5
+    },
+    {
+      "question": "What products does Infineon make for electric vehicles?",
+      "answer": "Here\u2019s a breakdown of Infineon\u2019s products for electric vehicles, based on the provided documents:\n\n1.  **Power Semiconductors:** Infineon produces Silicon Carbide (SiC) MOSFETs (Document 2), specifica...",
+      "latency": 101.63844203948975,
+      "score": 0.8571428571428571,
+      "found_keywords": [
+        "power",
+        "semiconductor",
+        "IGBT",
+        "MOSFET",
+        "EV",
+        "electric"
+      ],
+      "missing_keywords": [
+        "chip"
+      ],
+      "num_docs": 5
+    },
+    {
+      "question": "What is Infineon's sustainability strategy?",
+      "answer": "Infineon\u2019s sustainability strategy centers around reducing its carbon footprint and promoting responsible operations. According to Document 1, sustainability is core to their business strategy, enabli...",
+      "latency": 87.34085512161255,
+      "score": 0.5,
+      "found_keywords": [
+        "carbon",
+        "emission",
+        "climate"
+      ],
+      "missing_keywords": [
+        "environment",
+        "green",
+        "sustainable"
+      ],
+      "num_docs": 5
+    },
+    {
+      "question": "What skills are needed for an internship at Infineon?",
+      "answer": "Okay, let\u2019s analyze the documents to answer the question: \u201cWhat skills are needed for an internship at Infineon?\u201d\n\n1.  **Relevant Documents:** Documents 1, 2, and 3 are most relevant as they detail ML...",
+      "latency": 110.61990094184875,
+      "score": 0.8,
+      "found_keywords": [
+        "python",
+        "machine learning",
+        "engineering",
+        "programming"
+      ],
+      "missing_keywords": [
+        "data"
+      ],
+      "num_docs": 5
+    },
+    {
+      "question": "What is Infineon's AI strategy?",
+      "answer": "Here\u2019s a breakdown of Infineon\u2019s AI strategy based on the provided documents:\n\n1. **Relevant Documents:** All five documents (Document 1, Document 2, Document 3, Document 4, and Document 5) are releva...",
+      "latency": 122.03148126602173,
+      "score": 0.5,
+      "found_keywords": [
+        "AI",
+        "artificial intelligence"
+      ],
+      "missing_keywords": [
+        "machine learning",
+        "automation"
+      ],
+      "num_docs": 5
+    }
+  ]
+}

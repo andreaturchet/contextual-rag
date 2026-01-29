@@ -1,0 +1,76 @@
+# Docker Compose for RAG System
+# -----------------------------
+# Start everything:  docker-compose -f deployment/docker-compose.yml up --build
+# Stop:              docker-compose -f deployment/docker-compose.yml down
+#
+# After startup:
+#   - API docs:  http://localhost:8000/docs
+#   - Health:    http://localhost:8000/health
+#   - Query:     curl -X POST http://localhost:8000/query \
+#                  -H "Content-Type: application/json" \
+#                  -d '{"question": "What is Infineon?"}'
+
+version: '3.8'
+
+services:
+  # Ollama - Local LLM Server
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    deploy:
+      resources:
+        reservations:
+          memory: 8G
+
+  # Model Loader - Downloads required models
+  model-loader:
+    image: ollama/ollama:latest
+    container_name: model-loader
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Pulling models..."
+        ollama pull gemma3:4b
+        ollama pull qwen3-embedding:0.6b
+        echo "Models ready!"
+    restart: "no"
+
+  # RAG API Server
+  rag-api:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    container_name: rag-api
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - LLM_MODEL=gemma3:4b
+      - EMBEDDING_MODEL=qwen3-embedding:0.6b
+    ports:
+      - "8000:8000"
+    volumes:
+      - vectordb_data:/app/data/vectordb
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+    name: ollama_models
+  vectordb_data:
+    name: rag_vectordb

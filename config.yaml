@@ -1,0 +1,64 @@
+# Project for the Interview -- Configuration File
+# =====================================
+# This file contains all settings for the RAG system.
+llm:
+  model_name: "gemma3:4b"
+  base_url: "http://localhost:11434"      # Ollama server URL
+  temperature: 0.1
+  max_tokens: 512                         # Max n of tokens in response
+
+# =============================================================================
+# Embedding Settings
+# =============================================================================
+embeddings:
+  provider: "ollama"
+  model_name: "embeddinggemma"            # Gemma3-based embedding model (768 dims)
+
+# =============================================================================
+# Chunking Settings
+# =============================================================================
+chunking:
+  chunk_size: 500                         # Characters per chunk
+  chunk_overlap: 50                       # Overlap between chunks (should prevents losing context)
+  
+  # Contextual Retrieval (Anthropic, Sept 2024 + DataPizza research, Jan 2026)
+  # Adds LLM-generated context to each chunk before embedding
+  # Research shows: best gains at k=5, works well with rerankers
+  contextual:
+    enabled: true
+    batch_size: 5                         # Process 5 chunks at a time
+    max_document_context: 4000            # Max chars of document to include
+
+# =============================================================================
+# Vector Store Settings
+# =============================================================================
+vectorstore:
+  type: "chroma"
+  persist_directory: "./data/vectordb"
+  collection_name: "documents"
+
+# =============================================================================
+# Retrieval Settings
+# =============================================================================
+retrieval:
+  top_k: 5                                # Number of documents to retrieve
+  score_threshold: 0.0                    # Minimum similarity score (0 = no threshold)
+
+# =============================================================================
+# Reranker Settings
+# =============================================================================
+reranker:
+  enabled: true
+  model_name: "Qwen/Qwen3-Reranker-0.6B"
+  top_k: 5                                # Number of docs after reranking
+
+# =============================================================================
+# Evaluation Settings (for CI/CD quality gates)
+# =============================================================================
+evaluation:
+  # Minimum scores required to pass quality gates
+  min_retrieval_precision: 0.7            # At least 70% of retrieved docs must be relevant
+  min_answer_faithfulness: 0.8            # Answer must be 80% grounded in context
+  
+  # Test dataset location
+  test_dataset: "./evaluation/test_questions.json"

@@ -1,0 +1,46 @@
+{
+    "description": "Test dataset for evaluating the RAG system",
+    "version": "1.0",
+    "questions": [
+        {
+            "id": "q1",
+            "question": "What is Infineon Technologies?",
+            "expected_topics": ["semiconductor", "company", "German"],
+            "relevant_sources": ["about.txt", "company_info.txt"],
+            "difficulty": "easy"
+        },
+        {
+            "id": "q2",
+            "question": "When was Infineon founded?",
+            "expected_answer_contains": ["1999"],
+            "relevant_sources": ["history.txt", "about.txt"],
+            "difficulty": "easy"
+        },
+        {
+            "id": "q3",
+            "question": "What are the main products of Infineon?",
+            "expected_topics": ["semiconductor", "automotive", "sensors", "power"],
+            "relevant_sources": ["products.txt"],
+            "difficulty": "medium"
+        },
+        {
+            "id": "q4",
+            "question": "Where is Infineon headquartered?",
+            "expected_answer_contains": ["Germany", "Munich", "Neubiberg"],
+            "relevant_sources": ["about.txt", "locations.txt"],
+            "difficulty": "easy"
+        },
+        {
+            "id": "q5",
+            "question": "What industries does Infineon serve?",
+            "expected_topics": ["automotive", "industrial", "consumer", "IoT"],
+            "relevant_sources": ["products.txt", "markets.txt"],
+            "difficulty": "medium"
+        }
+    ],
+    "notes": [
+        "These questions are designed to test basic RAG functionality",
+        "Add more questions specific to your document corpus",
+        "Include both easy and hard questions for comprehensive testing"
+    ]
+}
