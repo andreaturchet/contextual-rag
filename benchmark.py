@@ -5,8 +5,7 @@ Compares RAG performance with and without Contextual Retrieval.
 
 Based on DataPizza research (Jan 2026):
 - Contextual Retrieval improves recall, especially at low k values
-- Best gains at k=5, works well with rerankers
-
+- Best gains at k=5, works well with reranker
 Usage:
     python benchmark.py
 """
@@ -26,47 +25,78 @@ from src.ingestion.chunker import TextChunker
 from src.ingestion.contextual_chunker import ContextualChunker
 from src.embeddings.embedder import Embedder
 from src.vectorstore.chroma_store import ChromaStore
-from src.retrieval.retriever import Retriever
-from src.retrieval.hf_reranker import HuggingFaceReranker
 from src.generation.llm_client import OllamaClient
 from src.rag.pipeline import RAGPipeline
+from evaluation.metrics import evaluate_retrieval, evaluate_response
 
 
-# Test questions with expected keywords in answers
-TEST_QUESTIONS = [
-    {
-        "question": "What are Infineon's main business segments?",
-        "expected_keywords": ["automotive", "power", "sensor", "security"]
-    },
-    {
-        "question": "What products does Infineon make for electric vehicles?",
-        "expected_keywords": ["power", "semiconductor", "chip", "IGBT", "MOSFET", "EV", "electric"]
-    },
-    {
-        "question": "What is Infineon's sustainability strategy?",
-        "expected_keywords": ["carbon", "emission", "environment", "green", "climate", "sustainable"]
-    },
-    {
-        "question": "What skills are needed for an internship at Infineon?",
-        "expected_keywords": ["python", "machine learning", "data", "engineering", "programming"]
-    },
-    {
-        "question": "What is Infineon's AI strategy?",
-        "expected_keywords": ["AI", "artificial intelligence", "machine learning", "automation"]
-    },
-]
+def load_test_questions(filepath: str = "evaluation/test_questions.json") -> list:
+    """
+    Load test questions from JSON file with ground truth.
+
+    Returns:
+        List of question dictionaries with expected_answer, expected_keywords, etc.
+    """
+    try:
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+
+        questions = data.get("questions", [])
+
+        # Convert format: map expected_answer_contains to expected_keywords for compatibility
+        for q in questions:
+            # Use expected_answer_contains as keywords, or expected_topics as fallback
+            if "expected_answer_contains" in q:
+                q["expected_keywords"] = q["expected_answer_contains"]
+            elif "expected_topics" in q:
+                q["expected_keywords"] = q["expected_topics"]
+            else:
+                q["expected_keywords"] = []
+
+        print(f"Loaded {len(questions)} test questions from {filepath}")
+        return questions
+
+    except FileNotFoundError:
+        print(f"Warning: {filepath} not found, using fallback questions")
+        return _get_fallback_questions()
+    except json.JSONDecodeError as e:
+        print(f"Warning: Error parsing {filepath}: {e}, using fallback questions")
+        return _get_fallback_questions()
 
 
-def create_pipeline(embedder, store, llm_client, use_reranker=True):
-    """Create a RAG pipeline."""
-    reranker = HuggingFaceReranker() if use_reranker else None
-    retriever = Retriever(
-        embedder=embedder,
-        vector_store=store,
-        top_k=5,
-        reranker=reranker
-    )
-    return RAGPipeline(retriever=retriever, llm_client=llm_client, top_k=5)
+def _get_fallback_questions() -> list:
+    """Fallback questions if JSON file is not available."""
+    return [
+        {
+            "question": "What are Infineon's main business segments?",
+            "expected_keywords": ["automotive", "power", "sensor", "security"],
+            "relevant_sources": ["infineon_company_overview.txt", "infineon_products_automotive.txt"]
+        },
+        {
+            "question": "What products does Infineon make for electric vehicles?",
+            "expected_keywords": ["power", "semiconductor", "IGBT", "MOSFET", "EV", "electric"],
+            "relevant_sources": ["infineon_products_automotive.txt"]
+        },
+        {
+            "question": "What is Infineon's sustainability strategy?",
+            "expected_keywords": ["carbon", "emission", "environment", "green", "climate", "sustainable"],
+            "relevant_sources": ["infineon_sustainability.txt"]
+        },
+        {
+            "question": "What skills are needed for an internship at Infineon?",
+            "expected_keywords": ["python", "machine learning", "data", "engineering", "programming"],
+            "relevant_sources": ["infineon_careers_intern.txt"]
+        },
+        {
+            "question": "What is Infineon's AI strategy?",
+            "expected_keywords": ["AI", "artificial intelligence", "machine learning", "automation"],
+            "relevant_sources": ["infineon_ai_strategy.txt"]
+        },
+    ]
+
+
+# Load test questions from JSON file (with ground truth)
+TEST_QUESTIONS = load_test_questions()
 
 
 def ingest_documents(llm_client, use_contextual: bool, db_path: str):
@@ -175,6 +205,91 @@ def evaluate_answer(answer: str, expected_keywords: list) -> dict:
     }
 
 
+def evaluate_ground_truth(answer: str, expected_answer: str) -> dict:
+    """
+    Evaluate answer against ground truth using RECALL-based metrics.
+
+    This measures: "Does the answer contain the key facts from the expected answer?"
+    It does NOT penalize answers that are more complete/verbose than expected.
+
+    Args:
+        answer: Generated answer from RAG
+        expected_answer: Ground truth answer from test_questions.json
+
+    Returns:
+        Dictionary with accuracy metrics
+    """
+    import re
+
+    if not expected_answer or not answer:
+        return {"accuracy": 0.0, "fact_recall": 0.0, "number_recall": 0.0, "entity_recall": 0.0}
+
+    answer_lower = answer.lower()
+    expected_lower = expected_answer.lower()
+
+    # Remove common stop words for better comparison
+    stop_words = {'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been',
+                  'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
+                  'would', 'could', 'should', 'may', 'might', 'must', 'shall',
+                  'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from',
+                  'and', 'or', 'but', 'if', 'then', 'than', 'as', 'that', 'this',
+                  'it', 'its', 'their', 'they', 'we', 'our', 'your', 'which'}
+
+    # === FACT RECALL ===
+    # How many important words from expected_answer appear in the answer?
+    # This is RECALL, not Jaccard - we don't penalize extra words in the answer
+    expected_words = set(expected_lower.split()) - stop_words
+    answer_words = set(answer_lower.split()) - stop_words
+
+    if not expected_words:
+        fact_recall = 1.0
+    else:
+        # Count how many expected words are found in answer
+        found_words = expected_words & answer_words
+        fact_recall = len(found_words) / len(expected_words)
+
+    # === NUMBER RECALL ===
+    # All numbers from expected answer should appear in the answer
+    expected_numbers = set(re.findall(r'\d+(?:\.\d+)?', expected_answer))
+    answer_numbers = set(re.findall(r'\d+(?:\.\d+)?', answer))
+
+    if not expected_numbers:
+        number_recall = 1.0
+    else:
+        found_numbers = expected_numbers & answer_numbers
+        number_recall = len(found_numbers) / len(expected_numbers)
+
+    # === ENTITY RECALL ===
+    # Important entities (proper nouns) from expected should appear in answer
+    # Extract capitalized words/phrases
+    expected_entities = set(re.findall(r'[A-Z][a-zA-Z]+', expected_answer))
+    answer_entities = set(re.findall(r'[A-Z][a-zA-Z]+', answer))
+
+    # Also check for acronyms (all caps, 2+ letters)
+    expected_acronyms = set(re.findall(r'\b[A-Z]{2,}\b', expected_answer))
+    answer_acronyms = set(re.findall(r'\b[A-Z]{2,}\b', answer))
+
+    expected_entities = expected_entities | expected_acronyms
+    answer_entities = answer_entities | answer_acronyms
+
+    if not expected_entities:
+        entity_recall = 1.0
+    else:
+        found_entities = expected_entities & answer_entities
+        entity_recall = len(found_entities) / len(expected_entities)
+
+    # === COMBINED ACCURACY ===
+    # Weighted combination: entities and numbers are more important than general words
+    accuracy = (fact_recall * 0.3) + (number_recall * 0.35) + (entity_recall * 0.35)
+
+    return {
+        "accuracy": round(accuracy, 3),
+        "fact_recall": round(fact_recall, 3),
+        "number_recall": round(number_recall, 3),
+        "entity_recall": round(entity_recall, 3)
+    }
+
+
 def run_benchmark(pipeline, test_name: str) -> dict:
     """Run benchmark on a pipeline."""
     print(f"\n{'='*50}")
@@ -183,11 +298,17 @@ def run_benchmark(pipeline, test_name: str) -> dict:
 
     results = []
     total_latency = 0
-    total_score = 0
+    total_keyword_score = 0
+    total_faithfulness = 0
+    total_precision = 0
+    total_accuracy = 0
+    has_ground_truth = False
 
     for i, test in enumerate(TEST_QUESTIONS, 1):
         question = test["question"]
-        expected = test["expected_keywords"]
+        expected_keywords = test.get("expected_keywords", [])
+        relevant_sources = test.get("relevant_sources", [])
+        expected_answer = test.get("expected_answer", "")
 
         print(f"\n[{i}/{len(TEST_QUESTIONS)}] {question[:50]}...")
 
@@ -196,50 +317,113 @@ def run_benchmark(pipeline, test_name: str) -> dict:
         result = pipeline.query(question)
         latency = time.time() - start
 
-        # Evaluate
-        eval_result = evaluate_answer(result["answer"], expected)
+        # Evaluate keywords (original method)
+        keyword_eval = evaluate_answer(result["answer"], expected_keywords)
+
+        # Evaluate ground truth (NEW - if expected_answer is available)
+        if expected_answer:
+            has_ground_truth = True
+            ground_truth_eval = evaluate_ground_truth(result["answer"], expected_answer)
+        else:
+            ground_truth_eval = {"accuracy": 0.0, "word_overlap": 0.0, "number_match": 0.0, "entity_match": 0.0}
+
+        # Evaluate retrieval quality (from evaluation/metrics.py)
+        retrieved_sources = [{"source": s} for s in result.get("sources", [])]
+        retrieval_eval = evaluate_retrieval(retrieved_sources, relevant_sources)
+
+        # Evaluate response quality (from evaluation/metrics.py)
+        response_eval = evaluate_response(
+            answer=result["answer"],
+            context=result.get("context", "")
+        )
 
         results.append({
             "question": question,
+            "expected_answer": expected_answer[:100] + "..." if len(expected_answer) > 100 else expected_answer,
             "answer": result["answer"][:200] + "..." if len(result["answer"]) > 200 else result["answer"],
             "latency": latency,
-            "score": eval_result["score"],
-            "found_keywords": eval_result["found"],
-            "missing_keywords": eval_result["missing"],
+            "keyword_score": keyword_eval["score"],
+            "found_keywords": keyword_eval["found"],
+            "missing_keywords": keyword_eval["missing"],
+            "ground_truth": ground_truth_eval,
+            "retrieval": {
+                "precision": retrieval_eval["precision"],
+                "recall": retrieval_eval["recall"],
+                "f1": retrieval_eval["f1"]
+            },
+            "response": {
+                "faithfulness": response_eval["faithfulness"],
+                "length_score": response_eval["length_score"],
+                "overall": response_eval["overall"]
+            },
             "num_docs": result["num_docs"]
         })
 
         total_latency += latency
-        total_score += eval_result["score"]
+        total_keyword_score += keyword_eval["score"]
+        total_faithfulness += response_eval["faithfulness"]
+        total_precision += retrieval_eval["precision"]
+        total_accuracy += ground_truth_eval["accuracy"]
 
-        print(f"  Score: {eval_result['score']:.0%} | Latency: {latency:.2f}s")
+        # Print with accuracy if ground truth available
+        if expected_answer:
+            print(f"  Accuracy: {ground_truth_eval['accuracy']:.0%} | Keywords: {keyword_eval['score']:.0%} | Faithfulness: {response_eval['faithfulness']:.0%} | Precision: {retrieval_eval['precision']:.0%} | Latency: {latency:.2f}s")
+        else:
+            print(f"  Keywords: {keyword_eval['score']:.0%} | Faithfulness: {response_eval['faithfulness']:.0%} | Precision: {retrieval_eval['precision']:.0%} | Latency: {latency:.2f}s")
 
-    avg_score = total_score / len(TEST_QUESTIONS)
-    avg_latency = total_latency / len(TEST_QUESTIONS)
+    num_questions = len(TEST_QUESTIONS)
 
-    return {
+    benchmark_result = {
         "name": test_name,
-        "avg_score": avg_score,
-        "avg_latency": avg_latency,
+        "avg_keyword_score": total_keyword_score / num_questions,
+        "avg_faithfulness": total_faithfulness / num_questions,
+        "avg_precision": total_precision / num_questions,
+        "avg_latency": total_latency / num_questions,
         "total_latency": total_latency,
         "results": results
     }
+
+    # Add accuracy metric only if ground truth was available
+    if has_ground_truth:
+        benchmark_result["avg_accuracy"] = total_accuracy / num_questions
+
+    return benchmark_result
 
 
 def print_comparison(baseline: dict, contextual: dict):
     """Print comparison between baseline and contextual retrieval."""
     print("\n")
-    print("=" * 60)
+    print("=" * 70)
     print("  BENCHMARK RESULTS")
-    print("=" * 60)
+    print("=" * 70)
 
-    print(f"\n{'Metric':<25} {'Baseline':<15} {'Contextual':<15} {'Diff':<10}")
-    print("-" * 60)
+    print(f"\n{'Metric':<25} {'Baseline':<15} {'Contextual':<15} {'Diff':<15}")
+    print("-" * 70)
 
-    # Average Score
-    score_diff = contextual["avg_score"] - baseline["avg_score"]
-    score_pct = (score_diff / baseline["avg_score"] * 100) if baseline["avg_score"] > 0 else 0
-    print(f"{'Avg Answer Quality':<25} {baseline['avg_score']:.1%}{'':<8} {contextual['avg_score']:.1%}{'':<8} {score_diff:+.1%}")
+    # Ground Truth Accuracy (NEW - if available)
+    if "avg_accuracy" in baseline or "avg_accuracy" in contextual:
+        b_acc = baseline.get("avg_accuracy", 0)
+        c_acc = contextual.get("avg_accuracy", 0)
+        acc_diff = c_acc - b_acc
+        print(f"{'Ground Truth Accuracy':<25} {b_acc:.1%}{'':<8} {c_acc:.1%}{'':<8} {acc_diff:+.1%}")
+
+    # Keyword Score
+    b_kw = baseline.get("avg_keyword_score", baseline.get("avg_score", 0))
+    c_kw = contextual.get("avg_keyword_score", contextual.get("avg_score", 0))
+    kw_diff = c_kw - b_kw
+    print(f"{'Keyword Score':<25} {b_kw:.1%}{'':<8} {c_kw:.1%}{'':<8} {kw_diff:+.1%}")
+
+    # Faithfulness
+    b_faith = baseline.get("avg_faithfulness", 0)
+    c_faith = contextual.get("avg_faithfulness", 0)
+    faith_diff = c_faith - b_faith
+    print(f"{'Faithfulness':<25} {b_faith:.1%}{'':<8} {c_faith:.1%}{'':<8} {faith_diff:+.1%}")
+
+    # Retrieval Precision
+    b_prec = baseline.get("avg_precision", 0)
+    c_prec = contextual.get("avg_precision", 0)
+    prec_diff = c_prec - b_prec
+    print(f"{'Retrieval Precision':<25} {b_prec:.1%}{'':<8} {c_prec:.1%}{'':<8} {prec_diff:+.1%}")
 
     # Average Latency
     latency_diff = contextual["avg_latency"] - baseline["avg_latency"]
@@ -248,38 +432,57 @@ def print_comparison(baseline: dict, contextual: dict):
     # Total Time
     print(f"{'Total Time (s)':<25} {baseline['total_latency']:.2f}{'':<11} {contextual['total_latency']:.2f}{'':<11}")
 
-    print("\n" + "-" * 60)
+    print("\n" + "-" * 70)
     print("Per-Question Comparison:")
-    print("-" * 60)
+    print("-" * 70)
 
     for i, (b, c) in enumerate(zip(baseline["results"], contextual["results"]), 1):
         q = b["question"][:40] + "..." if len(b["question"]) > 40 else b["question"]
-        b_score = b["score"]
-        c_score = c["score"]
+
+        # Get keyword scores (handle both old and new format)
+        b_score = b.get("keyword_score", b.get("score", 0))
+        c_score = c.get("keyword_score", c.get("score", 0))
         diff = c_score - b_score
+
+        # Get ground truth accuracy (NEW)
+        b_acc = b.get("ground_truth", {}).get("accuracy", 0)
+        c_acc = c.get("ground_truth", {}).get("accuracy", 0)
+
+        # Get faithfulness scores
+        b_faith = b.get("response", {}).get("faithfulness", 0)
+        c_faith = c.get("response", {}).get("faithfulness", 0)
 
         indicator = "✓" if diff > 0 else ("=" if diff == 0 else "✗")
         print(f"{i}. {q}")
-        print(f"   Baseline: {b_score:.0%} | Contextual: {c_score:.0%} | {indicator} {diff:+.0%}")
+        if b_acc > 0 or c_acc > 0:
+            print(f"   Accuracy:     Baseline: {b_acc:.0%} | Contextual: {c_acc:.0%}")
+        print(f"   Keywords:     Baseline: {b_score:.0%} | Contextual: {c_score:.0%} | {indicator} {diff:+.0%}")
+        print(f"   Faithfulness: Baseline: {b_faith:.0%} | Contextual: {c_faith:.0%}")
 
-    print("\n" + "=" * 60)
+    print("\n" + "=" * 70)
     print("  SUMMARY")
-    print("=" * 60)
+    print("=" * 70)
 
-    if score_diff > 0:
-        print(f"\n✓ Contextual Retrieval improved answer quality by {score_diff:.1%}")
-    elif score_diff < 0:
-        print(f"\n✗ Contextual Retrieval decreased answer quality by {abs(score_diff):.1%}")
+    # Overall improvement (average of all metrics)
+    overall_diff = (kw_diff + faith_diff + prec_diff) / 3
+
+    if overall_diff > 0:
+        print(f"\n✓ Contextual Retrieval improved overall quality:")
+        print(f"    Keywords:    {kw_diff:+.1%}")
+        print(f"    Faithfulness: {faith_diff:+.1%}")
+        print(f"    Precision:   {prec_diff:+.1%}")
+    elif overall_diff < 0:
+        print(f"\n✗ Contextual Retrieval decreased overall quality by {abs(overall_diff):.1%}")
     else:
-        print(f"\n= No difference in answer quality")
+        print(f"\n= No significant difference in quality")
 
-    print(f"  Latency overhead: {latency_diff:+.2f}s per query")
+    print(f"\n  Latency overhead: {latency_diff:+.2f}s per query")
 
     # Recommendation
-    print("\n" + "-" * 60)
-    if score_diff > 0.05:  # >5% improvement
+    print("\n" + "-" * 70)
+    if overall_diff > 0.05:  # >5% improvement
         print("Recommendation: USE Contextual Retrieval (quality gain > latency cost)")
-    elif score_diff < -0.05:  # >5% degradation
+    elif overall_diff < -0.05:  # >5% degradation
         print("Recommendation: DO NOT use Contextual Retrieval")
     else:
         print("Recommendation: Marginal difference - choose based on latency requirements")
@@ -305,15 +508,13 @@ def run_baseline_only():
     if not baseline_store:
         return
 
-    # Create reranker separately so we can unload it
-    reranker = HuggingFaceReranker()
-    retriever = Retriever(
+    # Create pipeline (reranker is created internally)
+    baseline_pipeline = RAGPipeline(
         embedder=embedder,
         vector_store=baseline_store,
-        top_k=5,
-        reranker=reranker
+        llm_client=llm_client,
+        top_k=5
     )
-    baseline_pipeline = RAGPipeline(retriever=retriever, llm_client=llm_client, top_k=5)
     baseline_results = run_benchmark(baseline_pipeline, "Baseline (No Context)")
 
     # Save baseline results
@@ -323,9 +524,9 @@ def run_baseline_only():
     print("\nBaseline results saved to: ./data/baseline_results.json")
 
     # Cleanup - unload reranker first (biggest memory user)
-    reranker.unload()
+    baseline_pipeline.unload()
     shutil.rmtree(baseline_db, ignore_errors=True)
-    del baseline_pipeline, baseline_store, retriever, reranker, embedder, llm_client
+    del baseline_pipeline, baseline_store, embedder, llm_client
     gc.collect()
 
     print("Baseline benchmark complete!")
@@ -351,15 +552,13 @@ def run_contextual_only():
     if not contextual_store:
         return
 
-    # Create reranker separately so we can unload it
-    reranker = HuggingFaceReranker()
-    retriever = Retriever(
+    # Create pipeline (reranker is created internally)
+    contextual_pipeline = RAGPipeline(
         embedder=embedder,
         vector_store=contextual_store,
-        top_k=5,
-        reranker=reranker
+        llm_client=llm_client,
+        top_k=5
     )
-    contextual_pipeline = RAGPipeline(retriever=retriever, llm_client=llm_client, top_k=5)
     contextual_results = run_benchmark(contextual_pipeline, "Contextual Retrieval")
 
     # Save contextual results
@@ -369,13 +568,115 @@ def run_contextual_only():
     print("\nContextual results saved to: ./data/contextual_results.json")
 
     # Cleanup - unload reranker first (biggest memory user)
-    reranker.unload()
+    contextual_pipeline.unload()
     shutil.rmtree(contextual_db, ignore_errors=True)
-    del contextual_pipeline, contextual_store, retriever, reranker, embedder, llm_client
+    del contextual_pipeline, contextual_store, embedder, llm_client
     gc.collect()
 
     print("Contextual benchmark complete!")
     return contextual_results
+
+
+def run_quick_benchmark():
+    """Run a quick benchmark with only 3 questions to compare baseline vs contextual."""
+    global TEST_QUESTIONS
+
+    print("\n" + "=" * 60)
+    print("  QUICK BENCHMARK (3 Questions)")
+    print("=" * 60)
+
+    # Save original questions and use only first 3
+    original_questions = TEST_QUESTIONS
+    TEST_QUESTIONS = TEST_QUESTIONS[:3]
+
+    print(f"\nUsing {len(TEST_QUESTIONS)} questions for quick comparison:")
+    for i, q in enumerate(TEST_QUESTIONS, 1):
+        print(f"  {i}. {q['question'][:60]}...")
+
+    try:
+        # Initialize LLM client
+        llm_client = OllamaClient(model="gemma3:4b")
+        if not llm_client.is_available():
+            print("\n❌ Ollama is not running! Start it with: ollama serve")
+            return
+
+        embedder = Embedder(model_name="qwen3-embedding:0.6b")
+
+        # ==================== BASELINE ====================
+        print("\n" + "-" * 60)
+        print("  Phase 1: BASELINE (No Contextual Retrieval)")
+        print("-" * 60)
+
+        baseline_db = "./data/quick_baseline"
+        print("\n[1/2] Ingesting documents (baseline)...")
+        baseline_store = ingest_documents(llm_client, use_contextual=False, db_path=baseline_db)
+
+        if not baseline_store:
+            print("❌ Failed to ingest documents!")
+            return
+
+        baseline_pipeline = RAGPipeline(
+            embedder=embedder,
+            vector_store=baseline_store,
+            llm_client=llm_client,
+            top_k=5
+        )
+
+        baseline_results = run_benchmark(baseline_pipeline, "Baseline")
+
+        # Cleanup baseline
+        baseline_pipeline.unload()
+        shutil.rmtree(baseline_db, ignore_errors=True)
+        del baseline_pipeline, baseline_store
+        gc.collect()
+        time.sleep(1)
+
+        # ==================== CONTEXTUAL ====================
+        print("\n" + "-" * 60)
+        print("  Phase 2: CONTEXTUAL RETRIEVAL")
+        print("-" * 60)
+
+        contextual_db = "./data/quick_contextual"
+        print("\n[2/2] Ingesting documents (with context)...")
+        contextual_store = ingest_documents(llm_client, use_contextual=True, db_path=contextual_db)
+
+        if not contextual_store:
+            print("❌ Failed to ingest documents!")
+            return
+
+        contextual_pipeline = RAGPipeline(
+            embedder=embedder,
+            vector_store=contextual_store,
+            llm_client=llm_client,
+            top_k=5
+        )
+
+        contextual_results = run_benchmark(contextual_pipeline, "Contextual")
+
+        # Cleanup contextual
+        contextual_pipeline.unload()
+        shutil.rmtree(contextual_db, ignore_errors=True)
+        del contextual_pipeline, contextual_store
+        gc.collect()
+
+        # ==================== COMPARISON ====================
+        print_comparison(baseline_results, contextual_results)
+
+        # Save quick results
+        with open("./data/quick_benchmark_results.json", "w") as f:
+            json.dump({
+                "baseline": baseline_results,
+                "contextual": contextual_results,
+                "num_questions": len(TEST_QUESTIONS),
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+            }, f, indent=2)
+
+        print("\n✓ Quick benchmark results saved to: ./data/quick_benchmark_results.json")
+
+    finally:
+        # Restore original questions
+        TEST_QUESTIONS = original_questions
+        gc.collect()
 
 
 def compare_results():
@@ -412,10 +713,13 @@ def main():
     parser.add_argument("--contextual", action="store_true", help="Run only contextual benchmark (contextual ON)")
     parser.add_argument("--compare", action="store_true", help="Compare saved results")
     parser.add_argument("--all", action="store_true", help="Run both sequentially with memory cleanup")
+    parser.add_argument("--quick", action="store_true", help="Quick test with 3 questions (runs both)")
 
     args = parser.parse_args()
 
-    if args.baseline:
+    if args.quick:
+        run_quick_benchmark()
+    elif args.baseline:
         run_baseline_only()
     elif args.contextual:
         run_contextual_only()

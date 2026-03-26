@@ -1,46 +1,100 @@
 {
-    "description": "Test dataset for evaluating the RAG system",
-    "version": "1.0",
+    "description": "Test dataset for evaluating the RAG system with ground truth answers",
+    "version": "2.0",
     "questions": [
         {
             "id": "q1",
             "question": "What is Infineon Technologies?",
+            "expected_answer": "Infineon Technologies AG is a world leader in semiconductor solutions that make life easier, safer, and greener. The company was founded in 1999 as a spin-off from Siemens AG.",
+            "expected_answer_contains": ["semiconductor", "1999", "Siemens"],
             "expected_topics": ["semiconductor", "company", "German"],
-            "relevant_sources": ["about.txt", "company_info.txt"],
+            "relevant_sources": ["infineon_company_overview.txt"],
             "difficulty": "easy"
         },
         {
             "id": "q2",
             "question": "When was Infineon founded?",
-            "expected_answer_contains": ["1999"],
-            "relevant_sources": ["history.txt", "about.txt"],
+            "expected_answer": "Infineon was founded on April 1, 1999 as a spin-off from Siemens AG.",
+            "expected_answer_contains": ["1999", "April", "Siemens"],
+            "relevant_sources": ["infineon_company_overview.txt"],
             "difficulty": "easy"
         },
         {
             "id": "q3",
-            "question": "What are the main products of Infineon?",
-            "expected_topics": ["semiconductor", "automotive", "sensors", "power"],
-            "relevant_sources": ["products.txt"],
+            "question": "What are the main business segments of Infineon?",
+            "expected_answer": "Infineon operates through four business segments: Automotive (ATV) with ~44% revenue share, Green Industrial Power (GIP) with ~20%, Power & Sensor Systems (PSS) with ~28%, and Connected Secure Systems (CSS) with ~8%.",
+            "expected_answer_contains": ["Automotive", "Green Industrial Power", "Power & Sensor Systems", "Connected Secure Systems"],
+            "expected_topics": ["automotive", "power", "sensor", "security"],
+            "relevant_sources": ["infineon_company_overview.txt"],
             "difficulty": "medium"
         },
         {
             "id": "q4",
             "question": "Where is Infineon headquartered?",
-            "expected_answer_contains": ["Germany", "Munich", "Neubiberg"],
-            "relevant_sources": ["about.txt", "locations.txt"],
+            "expected_answer": "Infineon is headquartered in Neubiberg (Munich), Germany.",
+            "expected_answer_contains": ["Neubiberg", "Munich", "Germany"],
+            "relevant_sources": ["infineon_company_overview.txt"],
             "difficulty": "easy"
         },
         {
             "id": "q5",
-            "question": "What industries does Infineon serve?",
-            "expected_topics": ["automotive", "industrial", "consumer", "IoT"],
-            "relevant_sources": ["products.txt", "markets.txt"],
+            "question": "What products does Infineon make for electric vehicles?",
+            "expected_answer": "Infineon makes Silicon Carbide (SiC) MOSFETs (CoolSiC family), IGBT Modules (HybridPACK family), and Gate Drivers (EiceDRIVER family) for electric vehicles. These are used in traction inverters, onboard chargers, and DC-DC converters.",
+            "expected_answer_contains": ["SiC", "MOSFET", "IGBT", "CoolSiC", "HybridPACK"],
+            "expected_topics": ["power", "semiconductor", "electric", "EV"],
+            "relevant_sources": ["infineon_products_automotive.txt"],
             "difficulty": "medium"
+        },
+        {
+            "id": "q6",
+            "question": "What is Infineon's sustainability strategy?",
+            "expected_answer": "Infineon aims to be carbon neutral by 2030 for Scope 1 and 2 emissions, with a target of 70% reduction in CO2 emissions by 2025 and 100% renewable electricity by 2030.",
+            "expected_answer_contains": ["carbon", "neutral", "2030", "CO2"],
+            "expected_topics": ["carbon", "emissions", "renewable", "green", "climate"],
+            "relevant_sources": ["infineon_sustainability.txt"],
+            "difficulty": "medium"
+        },
+        {
+            "id": "q7",
+            "question": "What skills are needed for an internship at Infineon?",
+            "expected_answer": "Internships at Infineon require being a currently enrolled student in a relevant field (EE, CS, Physics), good English skills, Python programming, and machine learning frameworks knowledge for AI/MLOps positions.",
+            "expected_answer_contains": ["Python", "machine learning", "student", "English"],
+            "expected_topics": ["python", "programming", "software", "engineering"],
+            "relevant_sources": ["infineon_careers_intern.txt"],
+            "difficulty": "medium"
+        },
+        {
+            "id": "q8",
+            "question": "What is Infineon's AI strategy?",
+            "expected_answer": "Infineon leverages AI across manufacturing excellence (predictive maintenance, automated optical inspection), product development (AI-assisted chip design), supply chain optimization, and enterprise AI solutions including an internal LLM initiative with RAG.",
+            "expected_answer_contains": ["AI", "manufacturing", "predictive", "LLM"],
+            "expected_topics": ["AI", "artificial intelligence", "machine learning", "automation"],
+            "relevant_sources": ["infineon_ai_strategy.txt"],
+            "difficulty": "medium"
+        },
+        {
+            "id": "q9",
+            "question": "Who is the CEO of Infineon?",
+            "expected_answer": "The CEO of Infineon is Jochen Hanebeck.",
+            "expected_answer_contains": ["Jochen Hanebeck"],
+            "relevant_sources": ["infineon_company_overview.txt"],
+            "difficulty": "easy"
+        },
+        {
+            "id": "q10",
+            "question": "What radar products does Infineon offer for autonomous driving?",
+            "expected_answer": "Infineon offers the RASIC family of 77GHz automotive radar ICs for autonomous driving applications including adaptive cruise control, blind spot detection, autonomous emergency braking, and parking assistance.",
+            "expected_answer_contains": ["RASIC", "77GHz", "radar"],
+            "expected_topics": ["radar", "ADAS", "autonomous", "driving"],
+            "relevant_sources": ["infineon_products_automotive.txt"],
+            "difficulty": "hard"
         }
     ],
     "notes": [
-        "These questions are designed to test basic RAG functionality",
-        "Add more questions specific to your document corpus",
-        "Include both easy and hard questions for comprehensive testing"
+        "Ground truth answers are based on actual document content in data/sample_docs/",
+        "expected_answer provides the ideal response for accuracy evaluation",
+        "expected_answer_contains lists required terms that MUST appear in the answer",
+        "expected_topics lists related terms for semantic similarity scoring",
+        "relevant_sources maps to actual files in the corpus for retrieval evaluation"
     ]
 }

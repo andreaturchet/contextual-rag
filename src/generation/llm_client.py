@@ -1,5 +1,5 @@
 """
-LLM Client
+LLM Client logic
 ----------
 Simple client for Ollama local LLM inference.
 

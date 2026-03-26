@@ -33,14 +33,20 @@ def evaluate_retrieval(
     Returns:
         Dictionary with precision, recall, f1
     """
-    # Get IDs of retrieved documents
+    import os
+
+    # Get IDs of retrieved documents (extract filename only from paths)
     retrieved_ids = set()
     for doc in retrieved_docs:
         doc_id = doc.get("id") or doc.get("chunk_id") or doc.get("source", "")
-        retrieved_ids.add(doc_id)
-    
-    relevant_ids = set(relevant_doc_ids)
-    
+        # Extract just the filename from full path
+        filename = os.path.basename(doc_id) if doc_id else ""
+        if filename:
+            retrieved_ids.add(filename)
+
+    # Also extract just filenames from relevant_doc_ids
+    relevant_ids = set(os.path.basename(rid) for rid in relevant_doc_ids)
+
     # Handle empty cases
     if not retrieved_ids and not relevant_ids:
         return {"precision": 1.0, "recall": 1.0, "f1": 1.0}

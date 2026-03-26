@@ -1,5 +1,5 @@
 """
-Text Chunker
+Text Chunker logic
 ------------
 Splits documents into smaller chunks for processing.
 
@@ -60,7 +60,7 @@ class TextChunker:
             # Calculate advance: at least (chunk_size - overlap) to make progress
             # If remaining text is small, just finish
             if end >= len(text):
-                # We've reached the end
+                # reached the end
                 break
 
             # Normal case: advance by chunk length minus overlap

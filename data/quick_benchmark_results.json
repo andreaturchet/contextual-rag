@@ -1,0 +1,211 @@
+{
+  "baseline": {
+    "name": "Baseline",
+    "avg_keyword_score": 0.7222222222222222,
+    "avg_faithfulness": 0.9203333333333333,
+    "avg_precision": 0.2776666666666667,
+    "avg_latency": 84.78198234240215,
+    "total_latency": 254.34594702720642,
+    "results": [
+      {
+        "question": "What is Infineon Technologies?",
+        "expected_answer": "Infineon Technologies AG is a world leader in semiconductor solutions that make life easier, safer, ...",
+        "answer": "Infineon Technologies AG is a world leader in semiconductor solutions that make life easier, safer, and greener. (Source: Document 1) It was founded in 1999 as a spin-off from Siemens AG and has appro...",
+        "latency": 120.72716307640076,
+        "keyword_score": 1.0,
+        "found_keywords": [
+          "semiconductor",
+          "1999",
+          "Siemens"
+        ],
+        "missing_keywords": [],
+        "ground_truth": {
+          "accuracy": 0.897,
+          "fact_recall": 0.889,
+          "number_recall": 1.0,
+          "entity_recall": 0.8
+        },
+        "retrieval": {
+          "precision": 0.25,
+          "recall": 1.0,
+          "f1": 0.4
+        },
+        "response": {
+          "faithfulness": 1.0,
+          "length_score": 1.0,
+          "overall": 1.0
+        },
+        "num_docs": 5
+      },
+      {
+        "question": "When was Infineon founded?",
+        "expected_answer": "Infineon was founded on April 1, 1999 as a spin-off from Siemens AG.",
+        "answer": "According to the company overview, Infineon was founded on April 1, 1999.",
+        "latency": 56.47904896736145,
+        "keyword_score": 0.6666666666666666,
+        "found_keywords": [
+          "1999",
+          "April"
+        ],
+        "missing_keywords": [
+          "Siemens"
+        ],
+        "ground_truth": {
+          "accuracy": 0.675,
+          "fact_recall": 0.5,
+          "number_recall": 1.0,
+          "entity_recall": 0.5
+        },
+        "retrieval": {
+          "precision": 0.25,
+          "recall": 1.0,
+          "f1": 0.4
+        },
+        "response": {
+          "faithfulness": 0.938,
+          "length_score": 1.0,
+          "overall": 0.969
+        },
+        "num_docs": 5
+      },
+      {
+        "question": "What are the main business segments of Infineon?",
+        "expected_answer": "Infineon operates through four business segments: Automotive (ATV) with ~44% revenue share, Green In...",
+        "answer": "Infineon operates through four business segments: AUTOMOTIVE (ATV), GREEN INDUSTRIAL POWER (GIP), and three other segments that are not detailed in the provided documents. According to the company ove...",
+        "latency": 77.13973498344421,
+        "keyword_score": 0.5,
+        "found_keywords": [
+          "Automotive",
+          "Green Industrial Power"
+        ],
+        "missing_keywords": [
+          "Power & Sensor Systems",
+          "Connected Secure Systems"
+        ],
+        "ground_truth": {
+          "accuracy": 0.237,
+          "fact_recall": 0.52,
+          "number_recall": 0.0,
+          "entity_recall": 0.231
+        },
+        "retrieval": {
+          "precision": 0.333,
+          "recall": 1.0,
+          "f1": 0.5
+        },
+        "response": {
+          "faithfulness": 0.823,
+          "length_score": 1.0,
+          "overall": 0.911
+        },
+        "num_docs": 5
+      }
+    ],
+    "avg_accuracy": 0.6030000000000001
+  },
+  "contextual": {
+    "name": "Contextual",
+    "avg_keyword_score": 0.8888888888888888,
+    "avg_faithfulness": 0.9166666666666666,
+    "avg_precision": 0.611,
+    "avg_latency": 94.58072868982951,
+    "total_latency": 283.7421860694885,
+    "results": [
+      {
+        "question": "What is Infineon Technologies?",
+        "expected_answer": "Infineon Technologies AG is a world leader in semiconductor solutions that make life easier, safer, ...",
+        "answer": "Infineon Technologies AG is a world leader in semiconductor solutions that make life easier, safer, and greener. (Document 1, Document 4) It was founded in 1999 as a spin-off from Siemens AG and has a...",
+        "latency": 121.26141905784607,
+        "keyword_score": 1.0,
+        "found_keywords": [
+          "semiconductor",
+          "1999",
+          "Siemens"
+        ],
+        "missing_keywords": [],
+        "ground_truth": {
+          "accuracy": 0.897,
+          "fact_recall": 0.889,
+          "number_recall": 1.0,
+          "entity_recall": 0.8
+        },
+        "retrieval": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "response": {
+          "faithfulness": 1.0,
+          "length_score": 1.0,
+          "overall": 1.0
+        },
+        "num_docs": 5
+      },
+      {
+        "question": "When was Infineon founded?",
+        "expected_answer": "Infineon was founded on April 1, 1999 as a spin-off from Siemens AG.",
+        "answer": "April 1, 1999 (According to Document 1).",
+        "latency": 85.30121994018555,
+        "keyword_score": 0.6666666666666666,
+        "found_keywords": [
+          "1999",
+          "April"
+        ],
+        "missing_keywords": [
+          "Siemens"
+        ],
+        "ground_truth": {
+          "accuracy": 0.55,
+          "fact_recall": 0.375,
+          "number_recall": 1.0,
+          "entity_recall": 0.25
+        },
+        "retrieval": {
+          "precision": 0.333,
+          "recall": 1.0,
+          "f1": 0.5
+        },
+        "response": {
+          "faithfulness": 0.75,
+          "length_score": 0.5,
+          "overall": 0.625
+        },
+        "num_docs": 5
+      },
+      {
+        "question": "What are the main business segments of Infineon?",
+        "expected_answer": "Infineon operates through four business segments: Automotive (ATV) with ~44% revenue share, Green In...",
+        "answer": "According to the documents, Infineon operates through four business segments: Automotive, Green Industrial Power, Power & Sensor Systems, and Connected Secure Systems.",
+        "latency": 77.17954707145691,
+        "keyword_score": 1.0,
+        "found_keywords": [
+          "Automotive",
+          "Green Industrial Power",
+          "Power & Sensor Systems",
+          "Connected Secure Systems"
+        ],
+        "missing_keywords": [],
+        "ground_truth": {
+          "accuracy": 0.398,
+          "fact_recall": 0.52,
+          "number_recall": 0.0,
+          "entity_recall": 0.692
+        },
+        "retrieval": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.667
+        },
+        "response": {
+          "faithfulness": 1.0,
+          "length_score": 1.0,
+          "overall": 1.0
+        },
+        "num_docs": 5
+      }
+    ],
+    "avg_accuracy": 0.6150000000000001
+  },
+  "num_questions": 3,
+  "timestamp": "2026-01-30 02:25:10"
+}

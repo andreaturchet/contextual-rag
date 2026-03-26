@@ -1,7 +1,7 @@
 """
-Embedder - Memory Optimized
+Embedder stuff logic
 ----------------------------
-Generates embeddings (vector representations) for text.
+Generates embeddings for text.
 
 Embeddings convert text to numbers so computers can compare meaning.
 Similar texts have similar vectors.

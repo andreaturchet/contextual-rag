@@ -63,8 +63,6 @@ def run_demo():
     chunker = TextChunker(chunk_size=500, overlap=50)
     chunks = chunker.chunk_documents(documents)
 
-    print(f"\nSample chunk: \"{chunks[0]['text'][:100]}...\"")
-
     input("\nPress Enter...")
 
     # Step 3: Create Embeddings
@@ -100,13 +98,9 @@ def run_demo():
     print("STEP 4: RAG Question Answering")
     print("-" * 50)
 
-    from src.retrieval.retriever import Retriever
-    from src.retrieval.hf_reranker import HuggingFaceReranker
     from src.rag.pipeline import RAGPipeline
     
-    reranker = HuggingFaceReranker()
-    retriever = Retriever(embedder=embedder, vector_store=store, top_k=3, reranker=reranker)
-    pipeline = RAGPipeline(retriever=retriever, llm_client=client, top_k=3)
+    pipeline = RAGPipeline(embedder=embedder, vector_store=store, llm_client=client, top_k=3)
 
     demo_questions = [
         "What are Infineon's main business segments?",

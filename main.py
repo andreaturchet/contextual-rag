@@ -17,13 +17,11 @@ from src.ingestion.chunker import TextChunker
 from src.ingestion.contextual_chunker import ContextualChunker
 from src.embeddings.embedder import Embedder
 from src.vectorstore.chroma_store import ChromaStore
-from src.retrieval.retriever import Retriever
-from src.retrieval.hf_reranker import HuggingFaceReranker
 from src.generation.llm_client import OllamaClient
 from src.rag.pipeline import RAGPipeline
 
 # Set to True to use Contextual Retrieval (adds LLM context to chunks)
-USE_CONTEXTUAL_RETRIEVAL = False  # Set True for better retrieval, False for faster ingestion
+USE_CONTEXTUAL_RETRIEVAL = True# Set True for better retrieval, False for faster ingestion
 
 
 def ingest_documents(llm_client=None):
@@ -109,12 +107,8 @@ def main():
         ingest_documents(llm_client)  # Pass LLM for contextual retrieval
         store = ChromaStore()
 
-    # Initialize retriever with reranker
-    reranker = HuggingFaceReranker()
-    retriever = Retriever(embedder=embedder, vector_store=store, top_k=5, reranker=reranker)
-
-    # Initialize pipeline
-    pipeline = RAGPipeline(retriever=retriever, llm_client=llm_client, top_k=5)
+    # Initialize pipeline (retriever and reranker are created internally)
+    pipeline = RAGPipeline(embedder=embedder, vector_store=store, llm_client=llm_client, top_k=5)
     print("  Pipeline ready")
     
     print("\n" + "=" * 50)

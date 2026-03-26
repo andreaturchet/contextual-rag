@@ -1,5 +1,5 @@
 """
-Contextual Chunker - Memory Optimized
+Contextual Chunker
 -------------------------------------
 Adds context to chunks using an LLM.
 
@@ -11,6 +11,11 @@ MEMORY OPTIMIZATIONS:
 - Aggressive garbage collection every 2 chunks
 - Explicit deletion of response objects
 - Truncated document stored once, not per chunk
+
+RETRIEVAL OPTIMIZATIONS (v2):
+- Improved prompt with specific rules
+- Extracts KEY FACTS not descriptions
+- Hybrid format: context + questions + content
 """
 
 from typing import List, Dict
@@ -22,24 +27,29 @@ logger = logging.getLogger(__name__)
 
 class ContextualChunker:
     """
-    Memory-optimized contextual chunker.
+    Memory-optimized contextual chunker with improved retrieval.
 
     Optimized for systems with limited RAM (16GB or less).
     """
     
-    # Shorter prompt template to reduce memory
+    # Lightweight prompt - only KEY_FACTS for faster processing
     PROMPT = """<document>
 {document}
 </document>
 
-Chunk to contextualize:
 <chunk>
 {chunk}
 </chunk>
 
-Give a short context (1-2 sentences) to situate this chunk within the document for search retrieval. Answer only with the context."""
+Extract 3-5 KEY FACTS from this chunk (names, numbers, definitions, dates). Be SPECIFIC - include actual values.
 
-    def __init__(self, llm_client, max_doc_length: int = 3000, batch_size: int = 2):
+Format:
+KEY_FACTS:
+- fact 1
+- fact 2
+- fact 3"""
+
+    def __init__(self, llm_client, max_doc_length: int = 5000, batch_size: int = 2):
         """
         Initialize the contextual chunker.
         
@@ -106,18 +116,45 @@ Give a short context (1-2 sentences) to situate this chunk within the document f
         del response
         del prompt
 
-        # Store context and build contextualized_text
-        # NOTE: We don't store 'original_text' - it's redundant with 'text'
-        chunk["context"] = context
-        chunk["contextualized_text"] = f"CONTEXT: {context}\n\nCONTENT: {chunk_text}"
+        # Parse response to extract facts
+        key_facts = ""
 
-        # Clear local variable
-        del context
+        if "KEY_FACTS:" in context:
+            key_facts = context.replace("KEY_FACTS:", "").strip()
+        else:
+            # Fallback: use entire response as context
+            key_facts = context
+
+        # Store parsed context
+        chunk["context"] = context
+        chunk["key_facts"] = key_facts
+
+        # Build contextualized text: Source -> Key facts -> Original content
+        contextualized_parts = []
+
+        # Add document source if available
+        source = chunk.get("source", "")
+        if source:
+            # Extract filename from path
+            import os
+            filename = os.path.basename(source).replace("_", " ").replace(".txt", "")
+            contextualized_parts.append(f"SOURCE: {filename}")
+
+        if key_facts:
+            contextualized_parts.append(f"KEY FACTS:\n{key_facts}")
+
+        contextualized_parts.append(f"CONTENT:\n{chunk_text}")
+
+        chunk["contextualized_text"] = "\n\n".join(contextualized_parts)
+
+        # Clear local variables
+        del context, key_facts
 
 
 if __name__ == "__main__":
-    print("Contextual Chunker - Memory Optimized")
+    print("Contextual Chunker - Memory Optimized v2")
     print("-" * 40)
     print("Based on Anthropic's Contextual Retrieval")
+    print("With question-aware context generation")
     print("Optimized for 16GB RAM systems")
     print("Run from main.py or demo.py to test")

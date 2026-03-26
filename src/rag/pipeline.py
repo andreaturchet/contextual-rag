@@ -14,28 +14,27 @@ from typing import Dict, List
 import time
 import logging
 
+from ..retrieval.retriever import Retriever
+from ..retrieval.hf_reranker import HuggingFaceReranker
+
 logger = logging.getLogger(__name__)
 
-# RAG Prompt - optimized based on research:
-# - Chain-of-Thought prompting (Wei et al., 2022)
-# - Citation for reducing hallucination (Gao et al., 2023)
-RAG_PROMPT = """You are a technical assistant for Infineon Technologies, specializing in answering questions about company documents.
+# RAG Prompt - optimized for direct, concise answers
+RAG_PROMPT = """You are a helpful assistant for Infineon Technologies. Answer questions based ONLY on the provided context.
 
-CONTEXT (Retrieved Documents):
+CONTEXT:
 {context}
 
-USER QUESTION:
-{question}
+QUESTION: {question}
 
 INSTRUCTIONS:
-Let's think step by step:
-1. First, identify which documents are relevant to the question
-2. Extract the key information from those documents
-3. Formulate a concise answer based ONLY on the provided context
-4. Cite the source document when making claims (e.g., "According to Document 1...")
-5. If the context doesn't contain the answer, say "I don't have enough information in the provided documents"
+- Answer the question directly and concisely
+- Focus on the CONTENT sections in the context (ignore KEY FACTS and QUESTIONS metadata)
+- Do NOT start with phrases like "Let me analyze" or "Based on the documents"
+- If the answer is not in the context, say "I don't have this information in the provided documents"
+- Include specific facts, numbers, and names when available
 
-YOUR ANSWER:"""
+ANSWER:"""
 
 
 class RAGPipeline:
@@ -43,25 +42,37 @@ class RAGPipeline:
     Main RAG pipeline for question answering.
     
     Usage:
-        pipeline = RAGPipeline(retriever=retriever, llm_client=client)
+        pipeline = RAGPipeline(embedder=embedder, vector_store=store, llm_client=client)
         result = pipeline.query("What are Infineon's products?")
         print(result["answer"])
     """
     
-    def __init__(self, retriever, llm_client, top_k: int = 5, prompt_template: str = None):
+    def __init__(self, embedder, vector_store, llm_client, top_k: int = 5,
+                 use_reranker: bool = True, prompt_template: str = None):
         """
         Initialize the RAG pipeline.
         
         Args:
-            retriever: Retriever instance
+            embedder: Embedder instance
+            vector_store: ChromaStore instance
             llm_client: OllamaClient instance
             top_k: Number of documents to retrieve
+            use_reranker: Whether to use reranker (default: True)
             prompt_template: Custom prompt (uses optimized RAG_PROMPT by default)
         """
-        self.retriever = retriever
         self.llm_client = llm_client
         self.top_k = top_k
         self.prompt_template = prompt_template or RAG_PROMPT
+
+        # Initialize retriever with optional reranker
+        self._reranker = HuggingFaceReranker() if use_reranker else None
+        self.retriever = Retriever(embedder=embedder, vector_store=vector_store, reranker=self._reranker)
+
+    def unload(self):
+        """Unload reranker model to free memory."""
+        if self._reranker:
+            self._reranker.unload()
+            self._reranker = None
 
     def query(self, question: str) -> Dict:
         """
@@ -99,6 +110,7 @@ class RAGPipeline:
         return {
             "answer": answer,
             "sources": sources,
+            "context": context,
             "num_docs": len(docs),
             "latency_seconds": time.time() - start_time
         }

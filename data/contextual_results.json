@@ -1,0 +1,319 @@
+{
+  "name": "Contextual Retrieval",
+  "avg_keyword_score": 0.8516666666666666,
+  "avg_faithfulness": 1.0,
+  "avg_precision": 0.5415,
+  "avg_latency": 90.14842712879181,
+  "total_latency": 901.4842712879181,
+  "results": [
+    {
+      "question": "What is Infineon Technologies?",
+      "expected_answer": "Infineon Technologies AG is a world leader in semiconductor solutions that make life easier, safer, ...",
+      "answer": "Infineon Technologies AG is a world leader in semiconductor solutions that make life easier, safer, and greener. It was founded in 1999 as a spin-off from Siemens AG and has approximately 56,200 emplo...",
+      "latency": 96.68043279647827,
+      "keyword_score": 1.0,
+      "found_keywords": [
+        "semiconductor",
+        "1999",
+        "Siemens"
+      ],
+      "missing_keywords": [],
+      "ground_truth": {
+        "accuracy": 0.913,
+        "fact_recall": 0.944,
+        "number_recall": 1.0,
+        "entity_recall": 0.8
+      },
+      "retrieval": {
+        "precision": 0.333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 1.0,
+        "overall": 1.0
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "When was Infineon founded?",
+      "expected_answer": "Infineon was founded on April 1, 1999 as a spin-off from Siemens AG.",
+      "answer": "April 1, 1999",
+      "latency": 85.63446521759033,
+      "keyword_score": 0.6666666666666666,
+      "found_keywords": [
+        "1999",
+        "April"
+      ],
+      "missing_keywords": [
+        "Siemens"
+      ],
+      "ground_truth": {
+        "accuracy": 0.55,
+        "fact_recall": 0.375,
+        "number_recall": 1.0,
+        "entity_recall": 0.25
+      },
+      "retrieval": {
+        "precision": 0.333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 0.5,
+        "overall": 0.75
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "What are the main business segments of Infineon?",
+      "expected_answer": "Infineon operates through four business segments: Automotive (ATV) with ~44% revenue share, Green In...",
+      "answer": "Infineon operates through four business segments: AUTOMOTIVE (ATV), GREEN INDUSTRIAL POWER (GIP), POWER & SENSOR SYSTEMS (PSS), and CONNECTED SECURE SYSTEMS (CSS).",
+      "latency": 86.37658309936523,
+      "keyword_score": 1.0,
+      "found_keywords": [
+        "Automotive",
+        "Green Industrial Power",
+        "Power & Sensor Systems",
+        "Connected Secure Systems"
+      ],
+      "missing_keywords": [],
+      "ground_truth": {
+        "accuracy": 0.315,
+        "fact_recall": 0.6,
+        "number_recall": 0.0,
+        "entity_recall": 0.385
+      },
+      "retrieval": {
+        "precision": 0.333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 1.0,
+        "overall": 1.0
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "Where is Infineon headquartered?",
+      "expected_answer": "Infineon is headquartered in Neubiberg (Munich), Germany.",
+      "answer": "Neubiberg (Munich), Germany",
+      "latency": 85.09516310691833,
+      "keyword_score": 1.0,
+      "found_keywords": [
+        "Neubiberg",
+        "Munich",
+        "Germany"
+      ],
+      "missing_keywords": [],
+      "ground_truth": {
+        "accuracy": 0.732,
+        "fact_recall": 0.4,
+        "number_recall": 1.0,
+        "entity_recall": 0.75
+      },
+      "retrieval": {
+        "precision": 0.333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 0.5,
+        "overall": 0.75
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "What products does Infineon make for electric vehicles?",
+      "expected_answer": "Infineon makes Silicon Carbide (SiC) MOSFETs (CoolSiC family), IGBT Modules (HybridPACK family), and...",
+      "answer": "Infineon makes Silicon Carbide (SiC) MOSFETs, specifically the CoolSiC\u2122 family, which have voltage ratings from 650V to 1700V. These are used in traction inverters, onboard chargers, and DC-DC convert...",
+      "latency": 95.33441495895386,
+      "keyword_score": 0.6,
+      "found_keywords": [
+        "SiC",
+        "MOSFET",
+        "CoolSiC"
+      ],
+      "missing_keywords": [
+        "IGBT",
+        "HybridPACK"
+      ],
+      "ground_truth": {
+        "accuracy": 0.718,
+        "fact_recall": 0.56,
+        "number_recall": 1.0,
+        "entity_recall": 0.571
+      },
+      "retrieval": {
+        "precision": 0.333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 1.0,
+        "overall": 1.0
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "What is Infineon's sustainability strategy?",
+      "expected_answer": "Infineon aims to be carbon neutral by 2030 for Scope 1 and 2 emissions, with a target of 70% reducti...",
+      "answer": "Infineon's sustainability strategy includes a target to be carbon neutral by 2030 (Scope 1 and 2 emissions), a 70% reduction in CO2 emissions by 2025 (vs. 2019 baseline), and 100% renewable electricit...",
+      "latency": 101.0133843421936,
+      "keyword_score": 1.0,
+      "found_keywords": [
+        "carbon",
+        "neutral",
+        "2030",
+        "CO2"
+      ],
+      "missing_keywords": [],
+      "ground_truth": {
+        "accuracy": 0.937,
+        "fact_recall": 0.789,
+        "number_recall": 1.0,
+        "entity_recall": 1.0
+      },
+      "retrieval": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 1.0,
+        "overall": 1.0
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "What skills are needed for an internship at Infineon?",
+      "expected_answer": "Internships at Infineon require being a currently enrolled student in a relevant field (EE, CS, Phys...",
+      "answer": "The required skills for an Infineon internship are: Python programming, Machine learning frameworks (PyTorch, TensorFlow), CI/CD and DevOps practices, Linux systems, and Cloud platforms (AWS, Azure). ...",
+      "latency": 90.17585682868958,
+      "keyword_score": 0.5,
+      "found_keywords": [
+        "Python",
+        "machine learning"
+      ],
+      "missing_keywords": [
+        "student",
+        "English"
+      ],
+      "ground_truth": {
+        "accuracy": 0.51,
+        "fact_recall": 0.273,
+        "number_recall": 1.0,
+        "entity_recall": 0.222
+      },
+      "retrieval": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 1.0,
+        "overall": 1.0
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "What is Infineon's AI strategy?",
+      "expected_answer": "Infineon leverages AI across manufacturing excellence (predictive maintenance, automated optical ins...",
+      "answer": "Infineon is committed to leveraging Artificial Intelligence across all business functions to improve efficiency, quality, and innovation. The AI strategy and implementation roadmap are outlined in thi...",
+      "latency": 89.13738799095154,
+      "keyword_score": 0.75,
+      "found_keywords": [
+        "AI",
+        "manufacturing",
+        "LLM"
+      ],
+      "missing_keywords": [
+        "predictive"
+      ],
+      "ground_truth": {
+        "accuracy": 0.838,
+        "fact_recall": 0.462,
+        "number_recall": 1.0,
+        "entity_recall": 1.0
+      },
+      "retrieval": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 0.7,
+        "overall": 0.85
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "Who is the CEO of Infineon?",
+      "expected_answer": "The CEO of Infineon is Jochen Hanebeck.",
+      "answer": "Jochen Hanebeck",
+      "latency": 85.04927086830139,
+      "keyword_score": 1.0,
+      "found_keywords": [
+        "Jochen Hanebeck"
+      ],
+      "missing_keywords": [],
+      "ground_truth": {
+        "accuracy": 0.565,
+        "fact_recall": 0.25,
+        "number_recall": 1.0,
+        "entity_recall": 0.4
+      },
+      "retrieval": {
+        "precision": 0.25,
+        "recall": 1.0,
+        "f1": 0.4
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 0.5,
+        "overall": 0.75
+      },
+      "num_docs": 5
+    },
+    {
+      "question": "What radar products does Infineon offer for autonomous driving?",
+      "expected_answer": "Infineon offers the RASIC family of 77GHz automotive radar ICs for autonomous driving applications i...",
+      "answer": "The RASIC\u2122 family of radar ICs utilizes 77GHz automotive radar and is used in applications including Adaptive cruise control, Blind spot detection, Autonomous emergency braking, and Parking assistance...",
+      "latency": 86.98731207847595,
+      "keyword_score": 1.0,
+      "found_keywords": [
+        "RASIC",
+        "77GHz",
+        "radar"
+      ],
+      "missing_keywords": [],
+      "ground_truth": {
+        "accuracy": 0.858,
+        "fact_recall": 0.818,
+        "number_recall": 1.0,
+        "entity_recall": 0.75
+      },
+      "retrieval": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.667
+      },
+      "response": {
+        "faithfulness": 1.0,
+        "length_score": 1.0,
+        "overall": 1.0
+      },
+      "num_docs": 5
+    }
+  ],
+  "avg_accuracy": 0.6935999999999999
+}

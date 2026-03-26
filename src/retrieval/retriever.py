@@ -60,8 +60,8 @@ class Retriever:
         # Convert query to embedding
         query_embedding = self.embedder.embed(query)
         
-        # Get more docs if using reranker
-        initial_top_k = top_k * 2 if self.reranker and use_reranker else top_k
+        # Get more docs if using reranker (3x for better coverage)
+        initial_top_k = top_k * 3 if self.reranker and use_reranker else top_k
 
         # Search vector store
         results = self.vector_store.search(query_embedding, top_k=initial_top_k)
